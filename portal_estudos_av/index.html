@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Estudos AV — Quiz Interativo por Matéria</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" onclick="irParaInicio()">
+        <span class="brand-badge">AV</span>
+        <div>
+          <h1>Portal de Estudos AV</h1>
+          <p>Quiz Interativo • Questões Embaralhadas</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="btnSom" class="btn btn-ghost" onclick="alternarSom()" title="Ativar/Desativar sons">🔊 Som: ON</button>
+        <button class="btn btn-outline" onclick="compartilharSite()">🔗 Compartilhar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- TELA INICIAL -->
+    <section id="telaInicio" class="view active">
+      <div class="hero">
+        <h2>Escolha sua matéria e treine para a AV</h2>
+        <p>Todas as questões dos PDFs e resumos reunidas em um só lugar, com perguntas e alternativas embaralhadas a cada partida.</p>
+        <div class="hero-stats">
+          <div class="stat-pill"><strong id="totalGeral">0</strong> questões totais</div>
+          <div class="stat-pill"><strong>3</strong> disciplinas completas</div>
+          <div class="stat-pill"><strong>100%</strong> embaralhado</div>
+        </div>
+      </div>
+
+      <div id="gridMaterias" class="grid-materias"></div>
+    </section>
+
+    <!-- TELA DO QUIZ -->
+    <section id="telaQuiz" class="view">
+      <div class="quiz-header">
+        <button class="btn btn-ghost" onclick="confirmarSaida()">← Voltar às Matérias</button>
+        <div class="quiz-meta">
+          <span id="quizMateriaNome" class="tag-materia">Matéria</span>
+          <span id="quizProgressoTexto">Questão 1 de 10</span>
+        </div>
+        <div class="quiz-placar">
+          <span class="score-box">✅ <strong id="scoreAcertos">0</strong></span>
+          <span class="score-box">🔥 <strong id="scoreStreak">0</strong></span>
+        </div>
+      </div>
+
+      <div class="progress-track">
+        <div id="progressBar" class="progress-fill"></div>
+      </div>
+
+      <article class="question-card">
+        <div class="question-top">
+          <span id="questionTopic" class="topic-badge">Tópico</span>
+          <button id="btnDica" class="btn btn-small btn-ghost" onclick="mostrarDica()">💡 Ver Dica</button>
+        </div>
+        <h3 id="questionText" class="question-text">Carregando pergunta...</h3>
+        <div id="hintBox" class="hint-box hidden"></div>
+
+        <div id="optionsContainer" class="options-list"></div>
+
+        <div id="feedbackBox" class="feedback-box hidden">
+          <div id="feedbackTitle" class="feedback-title"></div>
+          <p id="feedbackText" class="feedback-text"></p>
+        </div>
+
+        <div class="question-footer">
+          <button id="btnProxima" class="btn btn-primary hidden" onclick="proximaQuestao()">Próxima Questão →</button>
+        </div>
+      </article>
+    </section>
+
+    <!-- TELA DE RESULTADO -->
+    <section id="telaResultado" class="view">
+      <div class="result-card">
+        <div id="resultEmoji" class="result-emoji">🏆</div>
+        <h2 id="resultTitulo">Rodada Concluída!</h2>
+        <p id="resultSubtitulo" class="result-sub"></p>
+
+        <div class="result-stats">
+          <div class="res-box">
+            <span class="res-label">Acertos</span>
+            <strong id="resAcertos" class="res-val text-green">0</strong>
+          </div>
+          <div class="res-box">
+            <span class="res-label">Erros</span>
+            <strong id="resErros" class="res-val text-red">0</strong>
+          </div>
+          <div class="res-box">
+            <span class="res-label">Aproveitamento</span>
+            <strong id="resPercent" class="res-val text-blue">0%</strong>
+          </div>
+          <div class="res-box">
+            <span class="res-label">Maior Sequência</span>
+            <strong id="resMaxStreak" class="res-val text-amber">0</strong>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn btn-primary" onclick="jogarNovamente()">🔄 Jogar Novamente (Embaralhar)</button>
+          <button id="btnRevisarErros" class="btn btn-warning hidden" onclick="revisarErradas()">📝 Revisar Apenas as Erradas</button>
+          <button class="btn btn-outline" onclick="irParaInicio()">📚 Escolher Outra Matéria</button>
+        </div>
+
+        <div id="resumoRevisao" class="review-list"></div>
+      </div>
+    </section>
+
+    <!-- TELA BANCO DE QUESTÕES -->
+    <section id="telaBanco" class="view">
+      <div class="quiz-header">
+        <button class="btn btn-ghost" onclick="irParaInicio()">← Voltar</button>
+        <h2 id="bancoTitulo">Banco de Questões</h2>
+        <span id="bancoContador" class="tag-materia">0 questões</span>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="inputBusca" placeholder="Filtrar questões por palavra-chave (ex: LEFT JOIN, DNS, Flexbox, PDO)..." oninput="filtrarBanco()" />
+        <button class="btn btn-outline" onclick="toggleRespostasBanco()" id="btnToggleGabarito">👁️ Ocultar Respostas</button>
+      </div>
+
+      <div id="listaBanco" class="banco-list"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Carrega primeiro o banco completo de questões e depois a lógica do quiz -->
+  <script src="dados_questoes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
